@@ -3,14 +3,7 @@ function hideForm() {
     document.getElementById('appendForm').style.display = "none"
   }
 
-
-  fetch("https://salty-eyrie-53093.herokuapp.com/scores/1",{
-    method: "DELETE",
-    headers: {"Content-Type":"application/json"}
-})
-
 document.addEventListener("DOMContentLoaded", function(){
-    
     phaserGame()
     gameBox = document.getElementsByTagName("canvas")[0]
     gameBox.setAttribute("id","game-box")
@@ -18,7 +11,7 @@ document.addEventListener("DOMContentLoaded", function(){
     scoreBox.style.visibility = "hidden"
     scoreBox.setAttribute("id","score-box")
     gameBox.append(scoreBox)
-    scoreList = document.getElementById("appendList")
+    scoreList = document.getElementById("appendForm")
     scoreTable = document.createElement("ul")
     scoreList.append(scoreTable)
     writeList(scoreList)
@@ -26,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function(){
 })
 
 function writeList(scoreList){
+    scoreList.innerHTML = ""
     fetch("https://salty-eyrie-53093.herokuapp.com/scores/")
     .then(res=>res.json()).then(scores=> scores.forEach(score=>renderList(score,scoreList)))
 }
@@ -249,10 +243,7 @@ function collectBone(player, bones){
 }
 
 function hitMailman(player, mailman){
-    let bigScore 
-
-    scoreBox = Phaser.DOM.AddToDOM(document.getElementById("score-box"))
-    scoreBox.innerText = score 
+    let bigScore      
 
     this.physics.pause();
     player.setTint(0xff0000);
@@ -270,8 +261,6 @@ function hitMailman(player, mailman){
 }
 
 function jonFunc(score) {
-    console.log("hiya")
-    
     let appendFormDiv = document.getElementById('appendForm')
     
     
@@ -305,7 +294,7 @@ function jonFunc(score) {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ "gamescore": `${score}`, "user_id": `${id}`})
-      });
+      })
     }
     
 
