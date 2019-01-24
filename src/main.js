@@ -15,8 +15,8 @@ document.addEventListener("DOMContentLoaded", function(){
 function phaserGame(){
 var config = {
     type: Phaser.AUTO,
-    width: 1000,
-    height: 600,
+    width: 1200,
+    height: 700,
     parent: "game",
     // backgroundColor: '#0072bc',
     physics: {
@@ -35,6 +35,7 @@ var cursors
 var game = new Phaser.Game(config);
 var scoreText
 var score = 0
+var bones
 
 
 // console.log(scoreList)
@@ -67,76 +68,89 @@ function preload ()
     
     this.load.image("overworld", "dist/assets/tile/overworld.png")
     this.load.image("objects", "dist/assets/tile/objects.png")
-    this.load.tilemapTiledJSON('map1','dist/assets/tile/phaser-proj.json')
+    this.load.tilemapTiledJSON('map','dist/assets/tile/phaser-proj.json')
+    
 }
+
+
 
 function create ()
 {
-
-    const map1 = this.make.tilemap({key: "map1"});
-    const tileset = map1.addTilesetImage("overworld", "overworld");
-    const worldLayer = map1.createStaticLayer("ground", tileset, 0, 0);
-
+    const map = this.make.tilemap({key: "map"});
+    
+    const tileset = map.addTilesetImage("overworld", "overworld");
+    
+    const groundLayer = map.createStaticLayer("ground", tileset, 0, 0);
+    const worldLayer = map.createStaticLayer("world", tileset, 0, 0);
+    worldLayer.setCollisionByProperty({ collides: true });
     player = this.physics.add.sprite(200,200, "shiba_turn")
     player.setCollideWorldBounds(true);
 
+    scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '32px', fill: '#000' });
+    
     this.anims.create({
         key: 'turn',
         frames: [ { key: 'shiba_turn', frame: 0 } ],
         frameRate: 1,
         repeat: 1
     });
-
+    
     this.anims.create({
         key: 'right',
         frames: this.anims.generateFrameNumbers('shiba_right', { start: 1, end: 3 }),
         frameRate: 8,
         repeat: -1
     });
-
+    
     this.anims.create({
         key: 'left',
         frames: this.anims.generateFrameNumbers('shiba_left', { start: 1, end: 2 }),
         frameRate: 8,
         repeat: -1
     });
-
+    
     this.anims.create({
         key: 'up',
         frames: this.anims.generateFrameNumbers('shiba_up', { start: 1, end: 2 }),
         frameRate: 8,
         repeat: -1
     });
-
+    
     this.anims.create({
         key: 'down',
         frames: this.anims.generateFrameNumbers('shiba_down', { start: 1, end: 2 }),
         frameRate: 8,
         repeat: -1
     });
-
+    
     cursors = this.input.keyboard.createCursorKeys()
 
-    bones = this.physics.add.group({
-        key: 'bone',
-        repeat: 8,
-        setXY: {x: 100, y: 100, stepX: 25}
-    })
+    // this.bones = this.game.add.physicsGroup()
 
-    scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '32px', fill: '#000' });
-    this.physics.add.overlap(player, bones, collectBone, null, this);
-    // const coin = map.findObject("objects", obj => obj.name === "coin");
-    // coin = this.physics.add.sprite(coin.x, coin.y, "coin", "coin");
+    // bones = map.createFromObjects('objects', 1574, { key: 'bone' }, this.bones);
+    // this.bones = this.game.add.physicsGroup(); // step 1
+    // this.map.createFromObjects('objects', 'bone', 'objects', 1574, true, false, this.bones); // step 2
+    
+    // step 3
+    // this.bones.forEach(function(bone){
+    //     bone.body.immovable = true;
+    // });    
+
+
+   
+    // this.physics.add.overlap(player, bones, collectBone, null, this);
+   
     mailman = this.physics.add.image(300,300,'mailman')
     this.physics.add.collider(player, mailman, hitMailman, null, this)
-
+   
+    this.physics.add.collider(player,worldLayer)
     
 }
 
 function update ()
 {
     player.setVelocity(0);
-
+    
     if (cursors.left.isDown)
     {
         player.setVelocityX(-160);
@@ -144,7 +158,7 @@ function update ()
     }
     else if (cursors.right.isDown)
     {
-        player.setVelocityX(160);
+        player.setVelocityX(500);
         player.anims.play('right', true);
     }
 
@@ -160,11 +174,13 @@ function update ()
     }
 }
 
-function collectBone(player, bone){
-    bone.disableBody(true, true);
-    score += 10;
-    scoreText.setText(`Score: ${score}`)
-}
+
+
+// function collectBone(player, bone){
+//     bone.disableBody(true, true);
+//     score += 10;
+//     scoreText.setText(`Score: ${score}`)
+// }
 
 function hitMailman(player, mailman){
     
