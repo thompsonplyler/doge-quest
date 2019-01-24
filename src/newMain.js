@@ -1,33 +1,21 @@
-document.addEventListener("DOMContentLoaded", function(){
-    
-    phaserGame()
-    gameBox = document.getElementsByTagName("canvas")[0]
-    gameBox.setAttribute("id","game-box")
-    scoreBox = document.createElement("span")
-    scoreBox.style.visibility = "hidden"
-    scoreBox.setAttribute("id","score-box")
-    gameBox.append(scoreBox)
+import { loaderScene} from "./loaderScene";
+import { startScene} from "./startScene";
+import { gameScene} from "./gameScene";
+import { gameOverScene} from "./gameOverScene";
 
-
-    
-})
-
-function phaserGame(){
-var config = {
-    type: Phaser.AUTO,
-    width: 1200,
+let game = new Phaser.Game({
+    type:   Phaser.AUTO,
+    width:  1200,
     height: 700,
     parent: "game",
     // backgroundColor: '#0072bc',
     physics: {
-        default: 'arcade'
+            default: 'arcade'
     },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
+    scene: 
+        [loaderScene, startScene, gameScene, gameOverScene]
+    
+})
 
 var image
 var player
@@ -37,40 +25,11 @@ var scoreText
 var score = 0
 var bones
 var enemyspeed = 10
-var playerspeed = 160
 
 
 // console.log(scoreList)
 function preload ()
 {
-
-
-    this.load.image('bone', 'dist/assets/image/bone.png')
-    this.load.image('mailman', 'dist/assets/image/mailman.png')        
-    
-    this.load.spritesheet('shiba_down', 
-    'dist/assets/sprite/shibaInu-0.png',
-    { frameWidth: 32, frameHeight: 32 })
-    
-    this.load.spritesheet('shiba_up', 
-    'dist/assets/sprite/shibaInu-2.png',
-    { frameWidth: 32, frameHeight: 32 })
-    
-    this.load.spritesheet('shiba_left', 
-    'dist/assets/sprite/shibaInu-3.png',
-    { frameWidth: 32, frameHeight: 32 })
-    
-    this.load.spritesheet('shiba_right', 
-    'dist/assets/sprite/shibaInu-1.png',
-    { frameWidth: 32, frameHeight: 32 })
-    
-    this.load.spritesheet('shiba_turn', 
-    'dist/assets/sprite/shibaInu-4.png',
-    { frameWidth: 32, frameHeight: 32 })
-    
-    this.load.image("overworld", "dist/assets/tile/overworld.png")
-    this.load.image("objects", "dist/assets/tile/objects.png")
-    this.load.tilemapTiledJSON('map','dist/assets/tile/phaser-proj.json')
     
 }
 
@@ -88,9 +47,7 @@ function create ()
     player = this.physics.add.sprite(200,200, "shiba_turn")
     player.setCollideWorldBounds(true);
 
-    scoreText = this.add.text(16, 16, `Score: ${score}`, {fontFamily: "Arial", fontSize: '30px', fill: '#fff'  });
-    scoreText.font = "Arial Black"
-    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+    scoreText = this.add.text(16, 16, `Score: ${score}`, { fontSize: '32px', fill: '#000' });
     
     this.anims.create({
         key: 'turn',
@@ -133,7 +90,7 @@ function create ()
     this.physics.world.enable(bones);
     this.physics.add.overlap(player, bones, collectBone, null, this);
    
-    mailman = this.physics.add.image(500,300,'mailman')
+    mailman = this.physics.add.image(300,300,'mailman')
 
     this.physics.add.collider(player, mailman, hitMailman, null, this)
     
@@ -148,23 +105,23 @@ function update ()
     
     if (cursors.left.isDown)
     {
-        player.setVelocityX(-playerspeed);
+        player.setVelocityX(-160);
         player.anims.play('left', true);
     }
     else if (cursors.right.isDown)
     {
-        player.setVelocityX(playerspeed);
+        player.setVelocityX(160);
         player.anims.play('right', true);
     }
 
     if (cursors.up.isDown)
     {
-        player.setVelocityY(-playerspeed);
+        player.setVelocityY(-160);
         player.anims.play('up', true);
     }
     else if (cursors.down.isDown)
     {
-        player.setVelocityY(playerspeed);
+        player.setVelocityY(160);
         player.anims.play('down', true);
     }
 
@@ -220,28 +177,15 @@ function collectBone(player, bones){
     // bones.active = false
     // bones.forEach(bone=> bone.disableBody(true, true));
     score += 10;
-    enemyspeed += 15;
-    playerspeed += 7;
+    enemyspeed += 20;
     scoreText.setText(`Score: ${score}`)
+    console.log(bones.length)
 }
 
 function hitMailman(player, mailman){
-    let bigScore 
-
+    
     scoreBox = Phaser.DOM.AddToDOM(document.getElementById("score-box"))
     scoreBox.innerText = score 
-
-    this.physics.pause();
-    player.setTint(0xff0000);
-    player.anims.play('turn');
-    gameOver = true;
-    
-    bigScore = this.add.text(180, 180, `GAME OVER\nFinal Score: ${score}`, {fontFamily: "Arial", fontSize: '120px', fill: '#fff'  });
-    bigScore.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
-    scoreText.destroy()
-
-    reloadText = this.add.text(180,600, 'Reload the page to play again!', {fontFamily: "Arial", fontSize: '60px', fill: '#fff'  }); 
-    reloadText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
 
     fetch("http://localhost:3000", { 
     method: "post",
@@ -251,7 +195,9 @@ function hitMailman(player, mailman){
     // console.log(can)
     jonFunc(score)
     
-    
+    this.physics.pause();
+    player.setTint(0xff0000);
+    player.anims.play('turn');
+    gameOver = true;
 
-}
 }
