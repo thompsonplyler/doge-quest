@@ -105,49 +105,191 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   // Override the current require with this new one
   return newRequire;
 })({"src/main.js":[function(require,module,exports) {
-var config = {
-  type: Phaser.AUTO,
-  width: 800,
-  height: 600,
-  physics: {
-    default: 'arcade',
-    arcade: {
-      gravity: {
-        y: 200
-      }
-    }
-  },
-  scene: {
-    preload: preload,
-    create: create
-  }
-};
-var game = new Phaser.Game(config);
+document.addEventListener("DOMContentLoaded", function () {
+  phaserGame();
+  gameBox = document.getElementsByTagName("canvas")[0];
+  gameBox.setAttribute("id", "game-box");
+  scoreBox = document.createElement("span");
+  scoreBox.style.visibility = "hidden";
+  scoreBox.setAttribute("id", "score-box");
+  gameBox.append(scoreBox);
+});
 
-function preload() {
-  this.load.setBaseURL('http://labs.phaser.io');
-  this.load.image('sky', './assets/skies/space3.png');
-  this.load.image('logo', './assets/sprites/phaser3-logo.png');
-  this.load.image('red', './assets/particles/red.png');
-}
-
-function create() {
-  this.scale.pageAlignHorizontally = true;
-  this.add.image(400, 300, 'sky');
-  var particles = this.add.particles('red');
-  var emitter = particles.createEmitter({
-    speed: 100,
-    scale: {
-      start: 1,
-      end: 0
+function phaserGame() {
+  var config = {
+    type: Phaser.AUTO,
+    width: 1200,
+    height: 700,
+    parent: "game",
+    // backgroundColor: '#0072bc',
+    physics: {
+      default: 'arcade'
     },
-    blendMode: 'ADD'
-  });
-  var logo = this.physics.add.image(400, 100, 'logo');
-  logo.setVelocity(100, 200);
-  logo.setBounce(1, 1);
-  logo.setCollideWorldBounds(true);
-  emitter.startFollow(logo);
+    scene: {
+      preload: preload,
+      create: create,
+      update: update
+    }
+  };
+  var image;
+  var player;
+  var cursors;
+  var game = new Phaser.Game(config);
+  var scoreText;
+  var score = 0;
+  var bones; // console.log(scoreList)
+
+  function preload() {
+    this.load.image('bone', 'dist/assets/image/bone.png');
+    this.load.image('mailman', 'dist/assets/image/mailman.png');
+    this.load.spritesheet('shiba_down', 'dist/assets/sprite/shibaInu-0.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.spritesheet('shiba_up', 'dist/assets/sprite/shibaInu-2.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.spritesheet('shiba_left', 'dist/assets/sprite/shibaInu-3.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.spritesheet('shiba_right', 'dist/assets/sprite/shibaInu-1.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.spritesheet('shiba_turn', 'dist/assets/sprite/shibaInu-4.png', {
+      frameWidth: 32,
+      frameHeight: 32
+    });
+    this.load.image("overworld", "dist/assets/tile/overworld.png");
+    this.load.image("objects", "dist/assets/tile/objects.png");
+    this.load.tilemapTiledJSON('map', 'dist/assets/tile/phaser-proj.json');
+  }
+
+  function create() {
+    var map = this.make.tilemap({
+      key: "map"
+    });
+    var tileset = map.addTilesetImage("overworld", "overworld");
+    var groundLayer = map.createStaticLayer("ground", tileset, 0, 0);
+    var worldLayer = map.createStaticLayer("world", tileset, 0, 0);
+    worldLayer.setCollisionByProperty({
+      collides: true
+    });
+    player = this.physics.add.sprite(200, 200, "shiba_turn");
+    player.setCollideWorldBounds(true);
+    scoreText = this.add.text(16, 16, "Score: ".concat(score), {
+      fontSize: '32px',
+      fill: '#000'
+    });
+    this.anims.create({
+      key: 'turn',
+      frames: [{
+        key: 'shiba_turn',
+        frame: 0
+      }],
+      frameRate: 1,
+      repeat: 1
+    });
+    this.anims.create({
+      key: 'right',
+      frames: this.anims.generateFrameNumbers('shiba_right', {
+        start: 1,
+        end: 3
+      }),
+      frameRate: 8,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'left',
+      frames: this.anims.generateFrameNumbers('shiba_left', {
+        start: 1,
+        end: 2
+      }),
+      frameRate: 8,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'up',
+      frames: this.anims.generateFrameNumbers('shiba_up', {
+        start: 1,
+        end: 2
+      }),
+      frameRate: 8,
+      repeat: -1
+    });
+    this.anims.create({
+      key: 'down',
+      frames: this.anims.generateFrameNumbers('shiba_down', {
+        start: 1,
+        end: 2
+      }),
+      frameRate: 8,
+      repeat: -1
+    });
+    cursors = this.input.keyboard.createCursorKeys();
+    this.bones = this.game.add.physicsGroup();
+    bones = map.createFromObjects('objects', 1574, {
+      key: 'bone'
+    }, this.bones); // this.bones = this.game.add.physicsGroup(); // step 1
+    // this.map.createFromObjects('objects', 'bone', 'objects', 1574, true, false, this.bones); // step 2
+    // step 3
+    // this.bones.forEach(function(bone){
+    //     bone.body.immovable = true;
+    // });    
+
+    this.physics.add.overlap(player, bones, collectBone, null, this);
+    mailman = this.physics.add.image(300, 300, 'mailman');
+    this.physics.add.collider(player, mailman, hitMailman, null, this);
+    this.physics.add.collider(player, worldLayer);
+  }
+
+  function update() {
+    player.setVelocity(0);
+
+    if (cursors.left.isDown) {
+      player.setVelocityX(-160);
+      player.anims.play('left', true);
+    } else if (cursors.right.isDown) {
+      player.setVelocityX(500);
+      player.anims.play('right', true);
+    }
+
+    if (cursors.up.isDown) {
+      player.setVelocityY(-160);
+      player.anims.play('up', true);
+    } else if (cursors.down.isDown) {
+      player.setVelocityY(160);
+      player.anims.play('down', true);
+    }
+  }
+
+  function collectBone(player, bone) {
+    bone.disableBody(true, true);
+    score += 10;
+    scoreText.setText("Score: ".concat(score));
+  }
+
+  function hitMailman(player, mailman) {
+    scoreBox = Phaser.DOM.AddToDOM(document.getElementById("score-box"));
+    scoreBox.innerText = score;
+    fetch("http://localhost:3000", {
+      method: "post",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        "score": score
+      })
+    }); // can = Phaser.DOM.AddToDOM(document.getElementsByTagName("canvas"))
+    // console.log(can)
+
+    this.physics.pause();
+    player.setTint(0xff0000);
+    player.anims.play('turn');
+    gameOver = true;
+  }
 }
 },{}],"../../../../../usr/local/lib/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
@@ -176,7 +318,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34509" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "46855" + '/');
 
   ws.onmessage = function (event) {
     var data = JSON.parse(event.data);

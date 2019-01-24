@@ -36,6 +36,7 @@ var game = new Phaser.Game(config);
 var scoreText
 var score = 0
 var bones
+var enemyspeed = 10
 
 
 // console.log(scoreList)
@@ -124,10 +125,9 @@ function create ()
     });
     
     cursors = this.input.keyboard.createCursorKeys()
-
     // this.bones = this.game.add.physicsGroup()
-
-    // bones = map.createFromObjects('objects', 1574, { key: 'bone' }, this.bones);
+    bones = map.createFromObjects('objects', 1574, { key: 'bone' }, this.bones);
+    this.physics.world.enable(bones);
     // this.bones = this.game.add.physicsGroup(); // step 1
     // this.map.createFromObjects('objects', 'bone', 'objects', 1574, true, false, this.bones); // step 2
     
@@ -138,7 +138,7 @@ function create ()
 
 
    
-    // this.physics.add.overlap(player, bones, collectBone, null, this);
+    this.physics.add.overlap(player, bones, collectBone, null, this);
    
     mailman = this.physics.add.image(300,300,'mailman')
     this.physics.add.collider(player, mailman, hitMailman, null, this)
@@ -158,7 +158,7 @@ function update ()
     }
     else if (cursors.right.isDown)
     {
-        player.setVelocityX(500);
+        player.setVelocityX(160);
         player.anims.play('right', true);
     }
 
@@ -174,13 +174,19 @@ function update ()
     }
 }
 
+function (){
+    
+}
 
-
-// function collectBone(player, bone){
-//     bone.disableBody(true, true);
-//     score += 10;
-//     scoreText.setText(`Score: ${score}`)
-// }
+function collectBone(player, bones){
+    console.log(bones)
+    bones.destroy()
+    // console.log(event.target)
+    // bones.active = false
+    // bones.forEach(bone=> bone.disableBody(true, true));
+    score += 10;
+    scoreText.setText(`Score: ${score}`)
+}
 
 function hitMailman(player, mailman){
     
