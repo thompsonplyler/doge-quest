@@ -5,4 +5,29 @@
 
 body {
     background-color: #00BC54;
+    background-image: url(/images/grass_bg.png)
 }
+
+h1 {
+font-family: disposableDigi;
+color: white;
+font-size: 50px;
+text-shadow: 3px 3px 5px #000000;
+}
+
+@font-face {
+    font-family: disposableDigi;
+    src: url(/style/fonts/DisposableDigiBB.otf);
+  }
+
+div #game {
+    font-family: disposableDigi;
+}
+
+
+
+/* , {
+    method: "DELETE",
+    headers: {"Content-Type":"application/json"}
+    })
+    .then(res=> res.json()).then(entry => console.log(entry)).catch(err=> console.log(err) */

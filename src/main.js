@@ -1,3 +1,14 @@
+
+function hideForm() {
+    document.getElementById('appendForm').style.display = "none"
+  }
+
+
+  fetch("https://salty-eyrie-53093.herokuapp.com/scores/1",{
+    method: "DELETE",
+    headers: {"Content-Type":"application/json"}
+})
+
 document.addEventListener("DOMContentLoaded", function(){
     
     phaserGame()
@@ -7,10 +18,25 @@ document.addEventListener("DOMContentLoaded", function(){
     scoreBox.style.visibility = "hidden"
     scoreBox.setAttribute("id","score-box")
     gameBox.append(scoreBox)
+    scoreList = document.getElementById("appendList")
+    scoreTable = document.createElement("ul")
+    scoreList.append(scoreTable)
+    writeList(scoreList)
 
-
-    
 })
+
+function writeList(scoreList){
+    fetch("https://salty-eyrie-53093.herokuapp.com/scores/")
+    .then(res=>res.json()).then(scores=> scores.forEach(score=>renderList(score,scoreList)))
+}
+
+//render gamescore and username
+function renderList(score,appendList){
+    scoreLi = document.createElement("li")
+    scoreLi.innerText = `Name: ${score.username}, Score: ${score.gamescore}`
+    appendList.append(scoreLi)   
+}
+
 
 function phaserGame(){
 var config = {
@@ -43,7 +69,7 @@ var playerspeed = 160
 // console.log(scoreList)
 function preload ()
 {
-
+    
 
     this.load.image('bone', 'dist/assets/image/bone.png')
     this.load.image('mailman', 'dist/assets/image/mailman.png')        
@@ -88,9 +114,7 @@ function create ()
     player = this.physics.add.sprite(200,200, "shiba_turn")
     player.setCollideWorldBounds(true);
 
-    scoreText = this.add.text(16, 16, `Score: ${score}`, {fontFamily: "Arial", fontSize: '30px', fill: '#fff'  });
-    scoreText.font = "Arial Black"
-    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+    scoreText = this.add.text(16, 16, `Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '30px', fill: '#fff'  });    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
     
     this.anims.create({
         key: 'turn',
@@ -214,12 +238,11 @@ function update ()
 // }
 
 function collectBone(player, bones){
-    console.log(bones)
     bones.destroy()
     // console.log(event.target)
     // bones.active = false
     // bones.forEach(bone=> bone.disableBody(true, true));
-    score += 10;
+    score += 100;
     enemyspeed += 15;
     playerspeed += 7;
     scoreText.setText(`Score: ${score}`)
@@ -236,22 +259,55 @@ function hitMailman(player, mailman){
     player.anims.play('turn');
     gameOver = true;
     
-    bigScore = this.add.text(180, 180, `GAME OVER\nFinal Score: ${score}`, {fontFamily: "Arial", fontSize: '120px', fill: '#fff'  });
+    bigScore = this.add.text(180, 180, `GAME OVER\nFinal Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '110px', fill: '#fff'  });
     bigScore.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
     scoreText.destroy()
 
-    reloadText = this.add.text(180,600, 'Reload the page to play again!', {fontFamily: "Arial", fontSize: '60px', fill: '#fff'  }); 
+    reloadText = this.add.text(180,600, 'Reload the page to play again!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#fff'  }); 
     reloadText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
 
-    fetch("http://localhost:3000", { 
-    method: "post",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify({"score":score})})    
-    // can = Phaser.DOM.AddToDOM(document.getElementsByTagName("canvas"))
-    // console.log(can)
     jonFunc(score)
+}
+
+function jonFunc(score) {
+    console.log("hiya")
     
+    let appendFormDiv = document.getElementById('appendForm')
+    
+    
+    appendFormDiv.innerHTML =
+    `<form class="ui form" id="formId">Your Name: <input type="text" placeholder="What's your name?" name="formName"><button type="submit" onclick="hideForm()">Save</button></form>`
+    
+    let form = document.getElementById("formId");
+    
+    
+    form.addEventListener("submit", event => {
+      console.log("Saving name:", event.target.elements.formName.value);
+      event.preventDefault();
+    
+      fetch("https://salty-eyrie-53093.herokuapp.com/users", {
+        method: "POST",
+        headers: {
+          'Accept': "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ "name": `${event.target.elements.formName.value}` })
+      })
+      .then(res => res.json())
+      .then(res => postScore(res.id))
+    });
+    
+    function postScore(id) {
+      fetch("https://salty-eyrie-53093.herokuapp.com/scores",{
+        method: "POST",
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ "gamescore": `${score}`, "user_id": `${id}`})
+      });
+    }
     
 
-}
+    }
 }
