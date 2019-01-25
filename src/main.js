@@ -1,3 +1,10 @@
+// TO-DO: 
+// 1.) Mailman Sprite Animation
+// 2.) Music
+// 3.) Sound Effects on Game Over
+// 4.) Pathfinding AI
+
+
 
 function hideForm() {
     document.getElementById('appendForm').style.display = "none"
@@ -36,12 +43,6 @@ function renderList(score,appendList){
     scoreTable.append(newRow)
     newRow.append(nameTd)
     newRow.append(scoreTd)
-
-    
-    // scoreList
-    // scoreList
-    // scoreLi.innerText = `Name: ${score.username}, Score: ${score.gamescore}`
-    // appendList.append(scoreLi)   
 }
 
 
@@ -51,7 +52,6 @@ var config = {
     width: 1200,
     height: 700,
     parent: "game",
-    // backgroundColor: '#0072bc',
     physics: {
         default: 'arcade'
     },
@@ -72,8 +72,6 @@ var bones
 var enemyspeed = 10
 var playerspeed = 160
 
-
-// console.log(scoreList)
 function preload ()
 {
     
@@ -121,7 +119,7 @@ function create ()
     player = this.physics.add.sprite(200,200, "shiba_turn")
     player.setCollideWorldBounds(true);
 
-    scoreText = this.add.text(16, 16, `Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '30px', fill: '#fff'  });    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+    scoreText = this.add.text(16, 16, `Your Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '30px', fill: '#fff'  });    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
     
     this.anims.create({
         key: 'turn',
@@ -200,56 +198,15 @@ function update ()
         player.anims.play('down', true);
     }
 
-    // console.log(player.x)
     mailman.setVelocityX(enemyspeed)
     mailman.setVelocityY(enemyspeed);
 
     this.physics.moveToObject(mailman,player,enemyspeed)
-    // enemy follow velocity
-
-    // enemies.forEach(move);
-
-    //     if (d.isDown){
-    //         //player.body.velocity.x+=2;            //with physics
-    //         player.x+=4;                        //without physics
-
-    //     }
-    //     if (a.isDown){
-    //         //player.body.velocity.x-=2;            //with physics      
-    //         player.x-=4;                        //without physics
-    //     } 
-    //     if (s.isDown){
-    //         //player.body.velocity.y+=2;            //with physics      
-    //         player.y+=4;                        //without physics
-    //     }
-    //     if (w.isDown){
-    //         //player.body.velocity.y-=2;            //with physics      
-    //         player.y-=4;                        //without physics
-    //     } 
-
-    // }
-    // else
-    // {
-    //     enemies.setAll('body.velocity.x',0);
-    //     enemies.setAll('body.velocity.y',0);
-    // }
-//}
-
-
-
 
 }
 
-// move toward the player
-// function move(enemy){
-//     game.physics.arcade.moveToObject(enemy,player,60,enemyspeed*1000);
-// }
-
 function collectBone(player, bones){
     bones.destroy()
-    // console.log(event.target)
-    // bones.active = false
-    // bones.forEach(bone=> bone.disableBody(true, true));
     score += 100;
     enemyspeed += 15;
     playerspeed += 7;
@@ -264,16 +221,23 @@ function hitMailman(player, mailman){
     player.anims.play('turn');
     gameOver = true;
     
-    bigScore = this.add.text(180, 180, `GAME OVER\nFinal Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '110px', fill: '#fff'  });
+    bigScore = this.add.text(220, 180, `GAME OVER\nFinal Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '110px', fill: '#fff'  });
     bigScore.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
     scoreText.destroy()
 
-    reloadText = this.add.text(180,600, 'Reload the page to play again!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#fff'  }); 
+    dogeGameText = this.add.text(55,450, 'For more shiba inu fun, click here!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#3399ff'  });
+    dogeGameText.setInteractive(); 
+    shadow = dogeGameText.setStroke('#FFF', 5);
+    shadow.setShadow(-2, 2, '#rgba(0,0,0,0.5)', 5, true, false);
+
+    // dogeGameText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+    
+    dogeGameText.on('pointerup', openExternalLink, this);
+
+    reloadText = this.add.text(130,600, 'Reload the page to play again!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#fff'  }); 
     reloadText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
 
-    dogeGameText = this.add.text(80,450, 'For more shiba inu fun, click here!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#3399ff'  }); 
-    dogeGameText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
-    dogeGameText.on('pointerup', openExternalLink, this);
+
 
     jonFunc(score)
 }

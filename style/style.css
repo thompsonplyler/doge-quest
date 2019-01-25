@@ -3,7 +3,7 @@ body {
     background-image: url(/images/grass_bg.png)
 }
 
-h1 {
+h1, h2 {
 font-family: disposableDigi;
 color: white;
 font-size: 50px;
