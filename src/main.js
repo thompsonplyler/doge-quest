@@ -4,31 +4,46 @@ function hideForm() {
   }
 
 document.addEventListener("DOMContentLoaded", function(){
+    
     phaserGame()
+    $('table').tablesort()
     gameBox = document.getElementsByTagName("canvas")[0]
     gameBox.setAttribute("id","game-box")
     scoreBox = document.createElement("span")
     scoreBox.style.visibility = "hidden"
     scoreBox.setAttribute("id","score-box")
     gameBox.append(scoreBox)
+
     scoreList = document.getElementById("appendForm")
-    scoreTable = document.createElement("ul")
-    scoreList.append(scoreTable)
-    writeList(scoreList)
+    scoreTable = document.getElementById("scoreTable") 
+    
+    writeList(scoreTable)
 
 })
 
 function writeList(scoreList){
     scoreList.innerHTML = ""
     fetch("https://salty-eyrie-53093.herokuapp.com/scores/")
-    .then(res=>res.json()).then(scores=> scores.forEach(score=>renderList(score,scoreList)))
+    .then(res=>res.json()).then(scores=> scores.forEach(score=>renderList(score,scoreTable)))
 }
 
 //render gamescore and username
 function renderList(score,appendList){
-    scoreLi = document.createElement("li")
-    scoreLi.innerText = `Name: ${score.username}, Score: ${score.gamescore}`
-    appendList.append(scoreLi)   
+    console.log(scoreTable)
+    newRow = document.createElement("tr")
+    nameTd = document.createElement("td")
+    scoreTd = document.createElement("td")
+    nameTd.innerText = score.username
+    scoreTd.innerText = score.gamescore
+    scoreTable.append(newRow)
+    newRow.append(nameTd)
+    newRow.append(scoreTd)
+
+    
+    // scoreList
+    // scoreList
+    // scoreLi.innerText = `Name: ${score.username}, Score: ${score.gamescore}`
+    // appendList.append(scoreLi)   
 }
 
 
