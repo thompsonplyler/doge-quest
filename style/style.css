@@ -1,8 +1,3 @@
-/* canvas {
-    width: 50%;
-    margin: auto;
-} */
-
 body {
     background-color: #00BC54;
     background-image: url(/images/grass_bg.png)
@@ -24,10 +19,15 @@ div #game {
     font-family: disposableDigi;
 }
 
-
-
-/* , {
-    method: "DELETE",
-    headers: {"Content-Type":"application/json"}
-    })
-    .then(res=> res.json()).then(entry => console.log(entry)).catch(err=> console.log(err) */
+.column {
+    float: left;
+  }
+  
+  .left {
+    width: 20%;
+    
+  }
+  
+  .middle {
+    width: 80%;
+  }

@@ -6,7 +6,6 @@ function hideForm() {
 document.addEventListener("DOMContentLoaded", function(){
     
     phaserGame()
-    $('table').tablesort()
     gameBox = document.getElementsByTagName("canvas")[0]
     gameBox.setAttribute("id","game-box")
     scoreBox = document.createElement("span")
@@ -29,7 +28,6 @@ function writeList(scoreList){
 
 //render gamescore and username
 function renderList(score,appendList){
-    console.log(scoreTable)
     newRow = document.createElement("tr")
     nameTd = document.createElement("td")
     scoreTd = document.createElement("td")
@@ -172,7 +170,8 @@ function create ()
     
     this.physics.add.collider(player,worldLayer)
     this.physics.add.collider(mailman,worldLayer)
-    
+
+ 
 }
 
 function update ()
@@ -272,6 +271,10 @@ function hitMailman(player, mailman){
     reloadText = this.add.text(180,600, 'Reload the page to play again!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#fff'  }); 
     reloadText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
 
+    dogeGameText = this.add.text(80,450, 'For more shiba inu fun, click here!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#3399ff'  }); 
+    dogeGameText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+    dogeGameText.on('pointerup', openExternalLink, this);
+
     jonFunc(score)
 }
 
@@ -314,4 +317,21 @@ function jonFunc(score) {
     
 
     }
+
+    function openExternalLink () {
+        console.log("poop")
+        var url = 'https://jonathanbiro.com/DogeGame/'
+    
+        var s = window.open(url, '_blank');
+    
+        if (s && s.focus)
+        {
+            s.focus();
+        }
+        else if (!s)
+        {
+            window.location.href = url;
+        }
+    }
+
 }

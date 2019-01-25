@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <title>DOGE QUEST 1989</title>
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.css">
     <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.3.3/dist/semantic.min.js"></script>
     <script src="./lib/phaser.js"></script>
@@ -11,23 +11,15 @@
 </head>
 <body>
 <div align="center"><h1>Doge Quest 1989</h1></div>
+<div class="column left" id=scoreList align="center">
+    <h2>High Scores</h2>
+    <table align="center" id="scoreTable" class="ui sortable celled table">
+    </table>
+</div>
+<div class="column middle"> 
 <div align="center" id="game"></div>
 <div align="center" id="appendForm"></div>
-<div id=scoreList align="center">
-    <h2>High Scores</h2>
-
-<table align="center" id="scoreTable" class="ui sortable celled table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Score</th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    <tfoot>       
-    </tfoot>
-</table>
+</div>
 </div>
 </body>
 </html>
