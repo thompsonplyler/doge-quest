@@ -71,6 +71,11 @@ var score = 0
 var bones
 var enemyspeed = 10
 var playerspeed = 160
+var timedEvent 
+var timer = 20
+var map
+var getTileID
+var worldLayer
 
 function preload ()
 {
@@ -109,17 +114,21 @@ function preload ()
 
 function create ()
 {
-    const map = this.make.tilemap({key: "map"});
+   map = this.make.tilemap({key: "map"});
     
     const tileset = map.addTilesetImage("overworld", "overworld");
-    
+
+    //when pathing tutorial references "tiles" this is "tileset" here.
     const groundLayer = map.createStaticLayer("ground", tileset, 0, 0);
-    const worldLayer = map.createStaticLayer("world", tileset, 0, 0);
-    worldLayer.setCollisionByProperty({ collides: true });
+    
+    // this is the actual world that objects can collide with. 
+    worldLayer = map.createStaticLayer("world", tileset, 0, 0);
+     worldLayer.setCollisionByProperty({ collides: true });
+    
     player = this.physics.add.sprite(200,200, "shiba_turn")
     player.setCollideWorldBounds(true);
 
-    scoreText = this.add.text(16, 16, `Your Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '30px', fill: '#fff'  });    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+
     
     this.anims.create({
         key: 'turn',
@@ -158,6 +167,7 @@ function create ()
     
     cursors = this.input.keyboard.createCursorKeys()
 
+    // 1574 references the gid value from the .json in ../dist/tile
     bones = map.createFromObjects('objects', 1574, { key: 'bone' }, this.bones);
     this.physics.world.enable(bones);
     this.physics.add.overlap(player, bones, collectBone, null, this);
@@ -169,11 +179,45 @@ function create ()
     this.physics.add.collider(player,worldLayer)
     this.physics.add.collider(mailman,worldLayer)
 
- 
+    timedEvent = this.time.delayedCall(20000, hitMailman, [player,mailman], this);
+    scoreText = this.add.text(16, 4, `Your Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '24px', fill: '#fff'  });    
+    scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);    
+    timerText = this.add.text(16, 24, ``, {fontFamily: "disposableDigi", fontSize: '24px', fill: '#fff'  }); 
+    timerText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
+    
+    // this.finder = new EasyStar.js();
+    // let finder = this.finder
+    // console.log(worldLayer)
+
+    // var grid = [];
+
+    // for (var y = 0; y < map.height; y++){
+    //     var col = [];
+    //     for (var x = 0; x < map.width; x++){
+    //         col.push(getTileID(x,y))
+    //     } 
+    //     grid.push(col)
+    // }
+
+    // console.log(grid)
+    // finder.setGrid(grid)
+
 }
+
+// function getTileID(x,y){
+//     var tile = worldLayer.getTileAt(x,y)
+//     return tile.index
+// }
 
 function update ()
 {
+    
+    // getTileID = function(x,y){
+    //     var tile = worldLayer.getTileAt(x, y);
+    //     return tile.index;
+    // };
+
+    timerText.setText('Time left: ' + (20-(Math.floor(timedEvent.getElapsedSeconds()))));
     player.setVelocity(0);
     
     if (cursors.left.isDown)
@@ -203,6 +247,7 @@ function update ()
 
     this.physics.moveToObject(mailman,player,enemyspeed)
 
+
 }
 
 function collectBone(player, bones){
@@ -214,16 +259,18 @@ function collectBone(player, bones){
 }
 
 function hitMailman(player, mailman){
-    let bigScore      
-
-    this.physics.pause();
+    
+    
     player.setTint(0xff0000);
     player.anims.play('turn');
+    let bigScore      
+    this.physics.pause();
     gameOver = true;
     
     bigScore = this.add.text(220, 180, `GAME OVER\nFinal Score: ${score}`, {fontFamily: "disposableDigi", fontSize: '110px', fill: '#fff'  });
     bigScore.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
     scoreText.destroy()
+    timerText.destroy()
 
     dogeGameText = this.add.text(55,450, 'For more shiba inu fun, click here!', {fontFamily: "disposableDigi", fontSize: '60px', fill: '#3399ff'  });
     dogeGameText.setInteractive(); 
