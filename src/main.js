@@ -1,66 +1,5 @@
-// TO-DO: 
-// 1.) Mailman Sprite Animation
-// 2.) Music
-// 3.) Sound Effects on Game Over
-// 4.) Pathfinding AI
-
-
-
-function hideForm() {
-    document.getElementById('appendForm').style.display = "none"
-  }
-
-document.addEventListener("DOMContentLoaded", function(){
-    
-    phaserGame()
-    gameBox = document.getElementsByTagName("canvas")[0]
-    gameBox.setAttribute("id","game-box")
-    scoreBox = document.createElement("span")
-    scoreBox.style.visibility = "hidden"
-    scoreBox.setAttribute("id","score-box")
-    gameBox.append(scoreBox)
-
-    scoreList = document.getElementById("appendForm")
-    scoreTable = document.getElementById("scoreTable") 
-    
-    writeList(scoreTable)
-
-})
-
-function writeList(scoreList){
-    scoreList.innerHTML = ""
-    fetch("https://salty-eyrie-53093.herokuapp.com/scores/")
-    .then(res=>res.json()).then(scores=> scores.forEach(score=>renderList(score,scoreTable)))
-}
-
-//render gamescore and username
-function renderList(score,appendList){
-    newRow = document.createElement("tr")
-    nameTd = document.createElement("td")
-    scoreTd = document.createElement("td")
-    nameTd.innerText = score.username
-    scoreTd.innerText = score.gamescore
-    scoreTable.append(newRow)
-    newRow.append(nameTd)
-    newRow.append(scoreTd)
-}
-
-
 function phaserGame(){
-var config = {
-    type: Phaser.AUTO,
-    width: 1200,
-    height: 700,
-    parent: "game",
-    physics: {
-        default: 'arcade'
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
+
 
 var image
 var player
@@ -114,16 +53,7 @@ function preload ()
 
 function create ()
 {
-   map = this.make.tilemap({key: "map"});
-    
-    const tileset = map.addTilesetImage("overworld", "overworld");
 
-    //when pathing tutorial references "tiles" this is "tileset" here.
-    const groundLayer = map.createStaticLayer("ground", tileset, 0, 0);
-    
-    // this is the actual world that objects can collide with. 
-    worldLayer = map.createStaticLayer("world", tileset, 0, 0);
-     worldLayer.setCollisionByProperty({ collides: true });
     
     player = this.physics.add.sprite(200,200, "shiba_turn")
     player.setCollideWorldBounds(true);
@@ -167,7 +97,6 @@ function create ()
     
     cursors = this.input.keyboard.createCursorKeys()
 
-    // 1574 references the gid value from the .json in ../dist/tile
     bones = map.createFromObjects('objects', 1574, { key: 'bone' }, this.bones);
     this.physics.world.enable(bones);
     this.physics.add.overlap(player, bones, collectBone, null, this);
@@ -184,38 +113,11 @@ function create ()
     scoreText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);    
     timerText = this.add.text(16, 24, ``, {fontFamily: "disposableDigi", fontSize: '24px', fill: '#fff'  }); 
     timerText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
-    
-    // this.finder = new EasyStar.js();
-    // let finder = this.finder
-    // console.log(worldLayer)
-
-    // var grid = [];
-
-    // for (var y = 0; y < map.height; y++){
-    //     var col = [];
-    //     for (var x = 0; x < map.width; x++){
-    //         col.push(getTileID(x,y))
-    //     } 
-    //     grid.push(col)
-    // }
-
-    // console.log(grid)
-    // finder.setGrid(grid)
 
 }
 
-// function getTileID(x,y){
-//     var tile = worldLayer.getTileAt(x,y)
-//     return tile.index
-// }
-
 function update ()
 {
-    
-    // getTileID = function(x,y){
-    //     var tile = worldLayer.getTileAt(x, y);
-    //     return tile.index;
-    // };
 
     timerText.setText('Time left: ' + (20-(Math.floor(timedEvent.getElapsedSeconds()))));
     player.setVelocity(0);
@@ -276,8 +178,6 @@ function hitMailman(player, mailman){
     dogeGameText.setInteractive(); 
     shadow = dogeGameText.setStroke('#FFF', 5);
     shadow.setShadow(-2, 2, '#rgba(0,0,0,0.5)', 5, true, false);
-
-    // dogeGameText.setShadow(-2, 2, 'rgba(0,0,0,0.5)', 4);
     
     dogeGameText.on('pointerup', openExternalLink, this);
 
@@ -330,8 +230,8 @@ function jonFunc(score) {
     }
 
     function openExternalLink () {
-        console.log("poop")
-        var url = 'https://jonathanbiro.com/DogeGame/'
+
+        var url = 'https://jonbiro.github.io/DogeQuest-1989/'
     
         var s = window.open(url, '_blank');
     
