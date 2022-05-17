@@ -30,7 +30,11 @@ document.addEventListener("DOMContentLoaded", function(){
 function writeList(scoreList){
     scoreList.innerHTML = ""
     fetch("https://salty-eyrie-53093.herokuapp.com/scores/")
-    .then(res=>res.json()).then(scores=> scores.forEach(score=>renderList(score,scoreTable)))
+    .then(res=>res.json()).then(scores=> 
+        {for (let i = 0; i<=10; i++){
+            renderList(scores[i],scoreTable)
+        }}
+    )
 }
 
 //render gamescore and username
@@ -294,7 +298,7 @@ function jonFunc(score) {
     
     
     appendFormDiv.innerHTML =
-    `<form class="ui form" id="formId">Your Name: <input type="text" placeholder="What's your name?" name="formName"><button type="submit" onclick="hideForm()">Save</button></form>`
+    `<form class="ui form" id="formId">Your Name: <input style="width:200px; height: 1.5em" type="text" placeholder="What's your name?" name="formName"><button type="submit" onclick="hideForm()">Save</button></form>`
     
     let form = document.getElementById("formId");
     
